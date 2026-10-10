@@ -79,7 +79,7 @@ export default function Login({ dark, setDark }) {
                   placeholder={isSignup ? 'At least 6 characters' : 'Your password'} value={password}
                   onChange={e => setPassword(e.target.value)} className="input !pr-16" />
                 <button type="button" onClick={() => setShow(!show)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold" style={{ color: 'var(--pri)' }}>
+                  className="tbtn absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold" style={{ color: 'var(--pri)' }}>
                   {show ? 'Hide' : 'Show'}</button>
               </div>
             </div>
@@ -91,7 +91,7 @@ export default function Login({ dark, setDark }) {
           <p className="mt-5 text-center text-sm" style={{ color: 'var(--mute)' }}>
             {isSignup ? 'Already have an account?' : 'New to Tastemark?'}{' '}
             <button onClick={() => { setIsSignup(!isSignup); setError(''); setInfo('') }}
-              className="font-semibold" style={{ color: 'var(--pri)' }}>{isSignup ? 'Log in' : 'Create an account'}</button>
+              className="tbtn font-semibold" style={{ color: 'var(--pri)' }}>{isSignup ? 'Log in' : 'Create an account'}</button>
           </p>
           <p className="mt-4 border-t pt-4 text-center text-xs" style={{ color: 'var(--mute)', borderColor: 'var(--line)' }}>
             🔒 Encrypted connection · Your journal is visible only to you

@@ -35,6 +35,14 @@ body{margin:0;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antia
 .btn-pri{background:var(--pri);border-color:var(--pri);color:var(--on-pri);box-shadow:0 6px 16px #3d6a9426}
 .btn-pri:hover{background:var(--pri-d)}
 .btn:disabled{opacity:.6;cursor:wait}
+button:not(:disabled),[role=button],select,label[for]{cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--pri);transform:translateY(-1px);box-shadow:0 6px 16px #0f172a14}
+.btn-pri:hover:not(:disabled){background:var(--pri-d);border-color:var(--pri-d);box-shadow:0 8px 20px #3d6a9440}
+/* text-style buttons (Remove, Make owner, Create an account, Show...): look clickable on hover */
+.tbtn{padding:4px 9px;margin:-4px -9px;border-radius:8px;cursor:pointer;background:transparent;
+  transition:background .18s,transform .15s,color .18s}
+.tbtn:hover{background:color-mix(in srgb,currentColor 12%,transparent);text-decoration:underline;text-underline-offset:3px}
+.tbtn:active{transform:scale(.95)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;
   box-shadow:0 1px 2px #0f172a0a;transition:transform .25s,box-shadow .25s}
 .card:hover{transform:translateY(-2px);box-shadow:0 12px 28px #0f172a14}

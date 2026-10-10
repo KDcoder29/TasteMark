@@ -260,7 +260,7 @@ export default function Groups({ me, groups, onClose, onChanged, onOpen }) {
                     <button onClick={() => copy(g)} className="btn !px-4 !py-2.5 !text-sm">{copied === g.id ? 'Copied' : 'Copy'}</button>
                   </div>
                   {owner && (
-                    <button onClick={() => regenerate(g)} className="mt-2 text-xs font-semibold" style={{ color: 'var(--pri)' }}>
+                    <button onClick={() => regenerate(g)} className="tbtn mt-2 text-xs font-semibold" style={{ color: 'var(--pri)' }}>
                       Code leaked? Create a new one
                     </button>
                   )}
@@ -277,8 +277,8 @@ export default function Groups({ me, groups, onClose, onChanged, onOpen }) {
                       </span>
                       {owner && m.user_id !== me && (
                         <span className="flex shrink-0 gap-3">
-                          <button onClick={() => makeOwner(g, m.user_id)} className="text-xs font-medium" style={{ color: 'var(--pri)' }}>Make owner</button>
-                          <button onClick={() => removeMember(g, m.user_id)} className="text-xs font-medium" style={{ color: 'var(--bad)' }}>Remove</button>
+                          <button onClick={() => makeOwner(g, m.user_id)} className="tbtn text-xs font-medium" style={{ color: 'var(--pri)' }}>Make owner</button>
+                          <button onClick={() => removeMember(g, m.user_id)} className="tbtn text-xs font-medium" style={{ color: 'var(--bad)' }}>Remove</button>
                         </span>
                       )}
                     </li>
@@ -287,8 +287,8 @@ export default function Groups({ me, groups, onClose, onChanged, onOpen }) {
 
                 <div className="mt-4 border-t pt-3" style={{ borderColor: 'var(--line)' }}>
                   {owner
-                    ? <button onClick={() => removeGroup(g)} className="text-sm font-medium" style={{ color: 'var(--bad)' }}>Delete group and its entries</button>
-                    : <button onClick={() => leave(g)} className="text-sm font-medium" style={{ color: 'var(--bad)' }}>Leave group</button>}
+                    ? <button onClick={() => removeGroup(g)} className="tbtn text-sm font-medium" style={{ color: 'var(--bad)' }}>Delete group and its entries</button>
+                    : <button onClick={() => leave(g)} className="tbtn text-sm font-medium" style={{ color: 'var(--bad)' }}>Leave group</button>}
                 </div>
               </div>
             )

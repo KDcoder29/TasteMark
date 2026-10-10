@@ -102,6 +102,22 @@ export default function App() {
     try { localStorage.setItem('space', id) } catch {}
   }
 
+  // If someone removes you from a group, it disappears from your app too:
+  // re-check your memberships when you return to the tab and every 15 seconds.
+  useEffect(() => {
+    if (!uid) return
+    const refresh = () => { if (document.visibilityState === 'visible') loadGroups() }
+    const t = setInterval(refresh, 15000)
+    document.addEventListener('visibilitychange', refresh)
+    window.addEventListener('focus', refresh)
+    return () => { clearInterval(t); document.removeEventListener('visibilitychange', refresh); window.removeEventListener('focus', refresh) }
+  }, [uid, loadGroups])
+
+  // the open space no longer exists in my groups (removed / group deleted) -> go back to Personal
+  useEffect(() => {
+    if (groupsReady && space !== 'personal' && !groups.some(g => g.id === space)) chooseSpace('personal')
+  }, [groupsReady, groups, space])
+
   // after create / join / leave / delete: refresh and jump to the new group if there is one
   async function groupsChanged(newId) {
     const list = await loadGroups()
