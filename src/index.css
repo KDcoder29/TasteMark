@@ -76,13 +76,16 @@ button:not(:disabled),[role=button],select,label[for]{cursor:pointer}
 /* Login layout */
 .login{display:grid;min-height:100vh;background:var(--bg);grid-template-areas:"brand" "form" "info"}
 .l-brand,.l-info{background:var(--head);padding:20px 22px}
-.l-brand{grid-area:brand;padding-bottom:28px;border-bottom:1px solid var(--line)}
+.l-brand{grid-area:brand;padding-top:16px;padding-bottom:6px;background:var(--bg)}
 .l-info{grid-area:info;padding-top:28px;padding-bottom:36px;border-top:1px solid var(--line)}
-.l-form{grid-area:form;display:grid;place-items:center;padding:28px 16px}
+.l-form{grid-area:form;display:grid;place-items:start center;padding:12px 16px 28px}
+.login-card{border-top:4px solid var(--pri);box-shadow:0 20px 50px #0f172a1f}
+.login-card:hover{transform:none}
 @media (min-width:900px){
   .login{grid-template-columns:1.05fr 1fr;grid-template-rows:auto 1fr;grid-template-areas:"brand form" "info form"}
   .l-brand,.l-info{padding-left:max(48px,6vw);padding-right:48px;border:0}
-  .l-brand{padding-top:32px;padding-bottom:0}
+  .l-brand{padding-top:32px;padding-bottom:0;background:var(--head)}
+  .l-form{place-items:center;padding:28px 16px}
   .l-info{padding-top:48px}
 }
 .l-inner{max-width:520px}

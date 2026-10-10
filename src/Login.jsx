@@ -48,10 +48,10 @@ export default function Login({ dark, setDark }) {
             <span className="text-xl font-bold tracking-tight">Tastemark</span>
           </div>
         </div>
-        <h1 className="rise mt-8 text-3xl font-bold leading-tight tracking-tight lg:mt-16 lg:text-5xl" style={{ animationDelay: '80ms' }}>
-          Remember every<br />great bite.
+        <h1 className="rise mt-5 text-2xl font-bold leading-tight tracking-tight lg:mt-16 lg:text-5xl" style={{ animationDelay: '80ms' }}>
+          Remember every<br className="hidden lg:block" /> great bite.
         </h1>
-        <p className="rise mt-3 max-w-md text-base lg:mt-5 lg:text-lg" style={{ color: 'var(--mute)', animationDelay: '140ms' }}>
+        <p className="rise mt-3 hidden max-w-md text-base lg:mt-5 lg:block lg:text-lg" style={{ color: 'var(--mute)', animationDelay: '140ms' }}>
           Your private food journal. Save the places you eat, the dishes you loved, what they cost,
           and what you'd order again, then find it all in seconds.
         </p>
@@ -60,7 +60,7 @@ export default function Login({ dark, setDark }) {
 
       {/* Form */}
       <section className="l-form">
-        <div className="card rise w-full max-w-sm !p-7" style={{ boxShadow: '0 20px 50px #0f172a14', animationDelay: '120ms' }}>
+        <div className="card login-card rise w-full max-w-sm !p-6 sm:!p-7" style={{ animationDelay: '120ms' }}>
           <h2 className="text-2xl font-bold">{isSignup ? 'Create your account' : 'Welcome back'}</h2>
           <p className="mb-6 mt-1 text-sm" style={{ color: 'var(--mute)' }}>
             {isSignup ? 'It takes less than a minute. No card needed.' : 'Log in to open your journal.'}
