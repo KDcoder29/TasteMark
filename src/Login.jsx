@@ -14,26 +14,48 @@ const TRUST = [
   ['🚫', 'No ads, no sharing', 'Your places and dishes are never sold or shared.'],
 ]
 
-export default function Login({ dark, setDark }) {
-  const [email, setEmail] = useState('')
+export default function Login({ notice }) {
+  const [identity, setIdentity] = useState('')   // login: username or email
+  const [username, setUsername] = useState('')     // signup only
+  const [email, setEmail] = useState('')           // signup only
   const [password, setPassword] = useState('')
   const [show, setShow] = useState(false)
   const [isSignup, setIsSignup] = useState(false)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
+  const [showNotice, setShowNotice] = useState(true)
   const [busy, setBusy] = useState(false)
   const quote = useMemo(() => QUOTES[new Date().getDate() % QUOTES.length], [])
 
   async function submit(e) {
     e.preventDefault()
-    setBusy(true); setError(''); setInfo('')
-    if (isSignup) {
-      const { data, error } = await supabase.auth.signUp({ email, password })
-      if (error) setError(error.message)
-      else if (!data.session) setInfo('Almost done! Check your inbox to confirm your email, then log in.')
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) setError(error.message)
+    setBusy(true); setError(''); setInfo(''); setShowNotice(false)
+    try {
+      if (isSignup) {
+        const uname = username.trim()
+        if (!/^[A-Za-z0-9_.]{3,20}$/.test(uname)) throw new Error('Username must be 3-20 characters: letters, numbers, _ or .')
+        const { data: free, error: e0 } = await supabase.rpc('username_available', { u: uname })
+        if (e0) throw e0
+        if (!free) throw new Error('That username is taken. Please choose another.')
+        const { data, error: e1 } = await supabase.auth.signUp({
+          email: email.trim(), password,
+          options: { data: { username: uname }, emailRedirectTo: `${window.location.origin}/?confirmed=1` },
+        })
+        if (e1) throw e1
+        if (!data.session) setInfo('Almost done! Check your inbox to confirm your email, then log in with your username or email.')
+      } else {
+        let loginEmail = identity.trim()
+        if (!loginEmail.includes('@')) {            // it is a username: find its email
+          const { data: found, error: e0 } = await supabase.rpc('email_for_username', { u: loginEmail })
+          if (e0) throw e0
+          if (!found) throw new Error('Incorrect username/email or password.')
+          loginEmail = found
+        }
+        const { error: e1 } = await supabase.auth.signInWithPassword({ email: loginEmail, password })
+        if (e1) throw new Error(/invalid login/i.test(e1.message) ? 'Incorrect username/email or password.' : e1.message)
+      }
+    } catch (err) {
+      setError(err.message || 'Something went wrong. Please try again.')
     }
     setBusy(false)
   }
@@ -65,12 +87,31 @@ export default function Login({ dark, setDark }) {
           <p className="mb-6 mt-1 text-sm" style={{ color: 'var(--mute)' }}>
             {isSignup ? 'It takes less than a minute. No card needed.' : 'Log in to open your journal.'}
           </p>
+          {notice && showNotice && (
+            <p className="fade mb-4 rounded-lg px-3 py-2.5 text-sm" style={{ background: 'var(--okbg)', color: 'var(--ok)' }}>{notice}</p>
+          )}
           <form onSubmit={submit} className="space-y-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium" style={{ color: 'var(--mute)' }}>Email</label>
-              <input type="email" required autoComplete="email" placeholder="you@example.com" value={email}
-                onChange={e => setEmail(e.target.value)} className="input" />
-            </div>
+            {isSignup ? (
+              <>
+                <div>
+                  <label className="mb-1 block text-xs font-medium" style={{ color: 'var(--mute)' }}>Username</label>
+                  <input required autoComplete="username" autoCapitalize="none" spellCheck={false} placeholder="e.g. kandarp29"
+                    value={username} onChange={e => setUsername(e.target.value.replace(/\s/g, ''))} className="input" maxLength={20} />
+                  <p className="mt-1 text-xs" style={{ color: 'var(--mute)' }}>3-20 characters: letters, numbers, _ or .</p>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium" style={{ color: 'var(--mute)' }}>Email</label>
+                  <input type="email" required autoComplete="email" placeholder="you@example.com" value={email}
+                    onChange={e => setEmail(e.target.value)} className="input" />
+                </div>
+              </>
+            ) : (
+              <div>
+                <label className="mb-1 block text-xs font-medium" style={{ color: 'var(--mute)' }}>Username or email</label>
+                <input required autoComplete="username" autoCapitalize="none" spellCheck={false} placeholder="Username or you@example.com"
+                  value={identity} onChange={e => setIdentity(e.target.value)} className="input" />
+              </div>
+            )}
             <div>
               <label className="mb-1 block text-xs font-medium" style={{ color: 'var(--mute)' }}>Password</label>
               <div className="relative">
@@ -90,7 +131,7 @@ export default function Login({ dark, setDark }) {
           </form>
           <p className="mt-5 text-center text-sm" style={{ color: 'var(--mute)' }}>
             {isSignup ? 'Already have an account?' : 'New to Tastemark?'}{' '}
-            <button onClick={() => { setIsSignup(!isSignup); setError(''); setInfo('') }}
+            <button onClick={() => { setIsSignup(!isSignup); setError(''); setInfo(''); setPassword('') }}
               className="tbtn font-semibold" style={{ color: 'var(--pri)' }}>{isSignup ? 'Log in' : 'Create an account'}</button>
           </p>
           <p className="mt-4 border-t pt-4 text-center text-xs" style={{ color: 'var(--mute)', borderColor: 'var(--line)' }}>

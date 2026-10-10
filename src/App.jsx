@@ -18,7 +18,7 @@ function useTheme() {
   return [dark, setDark]
 }
 
-function ProfileMenu({ email, dark, setDark, onPassword, onGroups }) {
+function ProfileMenu({ email, username, dark, setDark, onPassword, onGroups }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -33,13 +33,14 @@ function ProfileMenu({ email, dark, setDark, onPassword, onGroups }) {
     <div ref={ref} className="relative">
       <button onClick={() => setOpen(!open)} aria-label="Account menu"
         className="grid h-9 w-9 place-items-center rounded-full text-sm font-semibold transition hover:scale-105"
-        style={{ background: 'var(--soft)', color: 'var(--pri)' }}>{(email || '?')[0].toUpperCase()}</button>
+        style={{ background: 'var(--soft)', color: 'var(--pri)' }}>{(username || email || '?')[0].toUpperCase()}</button>
 
       {open && (
         <div className="menu">
           <div className="px-3 pb-2 pt-2">
             <div className="text-xs" style={{ color: 'var(--mute)' }}>Signed in as</div>
-            <div className="truncate text-sm font-medium">{email}</div>
+            <div className="truncate text-sm font-semibold">{username ? `@${username}` : email}</div>
+            {username && <div className="truncate text-xs" style={{ color: 'var(--mute)' }}>{email}</div>}
           </div>
           <div className="my-1 h-px" style={{ background: 'var(--line)' }} />
 
@@ -74,12 +75,29 @@ export default function App() {
     try { return localStorage.getItem('space') || 'personal' } catch { return 'personal' }
   })
   const uid = session?.user?.id
+  const [username, setUsername] = useState('')
+  // Coming back from the "confirm your email" link: show a success message and ask them to log in
+  const [pendingConfirm, setPendingConfirm] = useState(() => {
+    try { return /[?&]confirmed=1/.test(window.location.search) } catch { return false }
+  })
+  const [notice, setNotice] = useState('')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
     return () => sub.subscription.unsubscribe()
   }, [])
+
+  useEffect(() => {
+    if (!pendingConfirm || session === undefined) return
+    const done = () => {
+      setPendingConfirm(false)
+      setNotice('✅ Email confirmed! You are registered. Log in with your username or email to continue.')
+      try { window.history.replaceState(null, '', window.location.pathname) } catch {}
+    }
+    if (session) supabase.auth.signOut().then(done)   // confirmation link signs them in; ask for a normal login instead
+    else done()
+  }, [pendingConfirm, session])
 
   const loadGroups = useCallback(async () => {
     if (!uid) return []
@@ -96,6 +114,12 @@ export default function App() {
   }, [uid])
 
   useEffect(() => { setGroupsReady(false); loadGroups() }, [loadGroups])
+
+  useEffect(() => {
+    if (!uid) { setUsername(''); return }
+    supabase.from('profiles').select('username').eq('id', uid).maybeSingle()
+      .then(({ data }) => setUsername(data?.username || ''))
+  }, [uid])
 
   const chooseSpace = id => {
     setSpace(id)
@@ -126,7 +150,8 @@ export default function App() {
   }
 
   if (session === undefined) return <div className="p-10"><div className="skel mx-auto max-w-md" /></div>
-  if (!session) return <Login dark={dark} setDark={setDark} />
+  if (pendingConfirm && session) return <div className="p-10"><div className="skel mx-auto max-w-md" /></div>
+  if (!session) return <Login notice={notice} />
 
   const activeGroup = groups.find(g => g.id === space) || null
 
@@ -147,7 +172,7 @@ export default function App() {
               className="ghost grid h-9 w-9 place-items-center rounded-full text-lg transition active:scale-90">
               <span key={String(dark)} className="fade inline-block">{dark ? '☀️' : '🌙'}</span>
             </button>
-            <ProfileMenu email={session.user.email} dark={dark} setDark={setDark}
+            <ProfileMenu email={session.user.email} username={username} dark={dark} setDark={setDark}
               onPassword={() => setPwOpen(true)} onGroups={() => setGroupsOpen(true)} />
           </div>
         </div>
